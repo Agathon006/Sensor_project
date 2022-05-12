@@ -11,14 +11,14 @@ DB = pymysql.connect(host='localhost',
 
 cur = DB.cursor()  # Курсор по БД-шке
 
-projects_headings = ('Название проекта', 'ФИО лидера', 'Дата создания', 'Число разработчиков',
-                     'Инвестиции (бел. руб.)', 'Описание')
-developers_headings = ('ФИО разработчика', 'Дата рождения', 'Решённых задач', 'Рейтинг', 'Описание')
+projects_headings = ('Название полки', 'Название товара', 'Дата последнего изменения', 'Количество контейнеров объёмом 100см^3',
+                     'Длина полки в см (бел. руб.)', 'Описание устройства отслеживания')
+developers_headings = ('Название товара', 'Срок годности', 'Количество товара в одном контейнере объёмом 100см^3', 'Стоимость товара', 'Описание товара')
 
 MainWindow = tk.Tk()
-MainWindow.title("Жуковский Павел Сергеевич, 2021 год, 3 курс, 12 группа")
+MainWindow.title("Учёт товаров на складе")
 MainWindow.attributes("-fullscreen", True)
-MainWindow["bg"] = "#DDA0DD"
+MainWindow["bg"] = "#20B2AA"
 
 ProjectsList = []
 DevsList = []
@@ -61,36 +61,36 @@ Var_OutputMenu_Devs = tk.StringVar(MainWindow)
 
 def CheckProjectName(str):
     if str == "":
-        messagebox.showerror("Ошибка ввода названия проекта", "Название проекта не может быть пустым!")
+        messagebox.showerror("Ошибка ввода названия полки", "Название полки не может быть пустым!")
     else:
-        if "Выбрать проект для" in str:
-            messagebox.showerror("Ошибка ввода имени проекта", "Проект не может быть с таким дурацким именем!")
+        if "Выбрать полку для" in str:
+            messagebox.showerror("Ошибка ввода имени полки", "Полку не может быть с таким дурацким именем!")
             return False
         cur.execute('SELECT EXISTS(SELECT * FROM projects WHERE prName = %s)', str)
         exist_or_not = cur.fetchall()[0][0]
         if exist_or_not == 1:
-            messagebox.showerror("Ошибка ввода имени проекта", "Проект с таким именем уже есть в базе данных!")
+            messagebox.showerror("Ошибка ввода имени полки", "Полку с таким именем уже есть в базе данных!")
             return False
         return True
     return False
 
 def CheckIfProjectChosen(str):
-    if "Выбрать проект для" in str:
-        messagebox.showerror("Ошибка выбора проекта", "Вы не выбрали проект!")
+    if "Выбрать полку для" in str:
+        messagebox.showerror("Ошибка выбора полки", "Вы не выбрали Полку!")
     else:
         return True
     return False
 
 def CheckLeaderFIOName(str):
-    if str == "Выбрать лидера проекта":
-        messagebox.showerror("Ошибка ввода ФИО лидера проекта", "Вы не выбрали ФИО лидера проекта!")
+    if str == "Выбрать товар для полки":
+        messagebox.showerror("Ошибка ввода Название товара полки", "Вы не выбрали Название товара полки!")
     else:
         return True
     return False
 
 def CheckProjectCrDate(str):
     if str == "":
-        messagebox.showerror("Ошибка выбора даты создания проекта", "Вы не выбрали дату создания проекта!")
+        messagebox.showerror("Ошибка выбора даты создания полки", "Вы не выбрали дату создания полки!")
     else:
         return True
     return False
@@ -99,11 +99,11 @@ def CheckDevsAmount(str):
     try:
         devs_num = int(str)
         if devs_num < 1:
-            messagebox.showerror("Ошибка ввода числа разработчиков", "Вы ввели не положительное число разработчиков!")
+            messagebox.showerror("Ошибка ввода числа товаров", "Вы ввели не положительное Количество контейнеров объёмом 100см^3!")
             return False
         return True
     except ValueError:
-        messagebox.showerror("Ошибка ввода числа разработчиков", "Вы ввели не целое число разработчиков!")
+        messagebox.showerror("Ошибка ввода числа товаров", "Вы ввели не целое Количество контейнеров объёмом 100см^3!")
         return False
 
 def CheckInvests(str):
@@ -119,41 +119,41 @@ def CheckInvests(str):
 
 def CheckDevName(str):
     if str == "":
-        messagebox.showerror("Ошибка ввода ФИО разработчика", "ФИО разработчика не может быть пустым!")
+        messagebox.showerror("Ошибка ввода Название товара", "Название товара не может быть пустым!")
     else:
         if str.count(' ') != 1 and str.count(' ') != 2:
-            messagebox.showerror("Ошибка ввода ФИО разработчика", "ФИО разработчика должно состоять из двух или трёх слов!")
+            messagebox.showerror("Ошибка ввода Название товара", "Название товара должно состоять из двух или трёх слов!")
         else:
             str_without_spaces = str.replace(' ', '')
             if str_without_spaces.isalpha():
                 words = str.split(' ')
                 for word in words:
                     if not word[0].isupper():
-                        messagebox.showerror("Ошибка ввода ФИО разработчика",
-                                             "Каждое из двух или трёх слов ФИО разработчика должно начинаться с большой буквы!")
+                        messagebox.showerror("Ошибка ввода Название товара",
+                                             "Каждое из двух или трёх слов Название товара должно начинаться с большой буквы!")
                         return False
                 cur.execute('SELECT EXISTS(SELECT * FROM developers WHERE devFIO = %s)', str)
                 exist_or_not = cur.fetchall()[0][0]
                 if exist_or_not == 1:
-                    messagebox.showerror("Ошибка ввода имени разработчика",
-                                         "Разработчик с таким ФИО уже есть в базе данных!")
+                    messagebox.showerror("Ошибка ввода имени товара",
+                                         "товар с таким ФИО уже есть в базе данных!")
                     return False
                 return True
             else:
-                messagebox.showerror("Ошибка ввода ФИО разработчика",
-                                     "В ФИО разработчика могут быть использованы только буквы!")
+                messagebox.showerror("Ошибка ввода Название товара",
+                                     "В Название товара могут быть использованы только буквы!")
     return False
 
 def CheckIfDevChosen(str):
-    if "Выбрать разработчика для" in str:
-        messagebox.showerror("Ошибка выбора разработчика", "Вы не выбрали разработчика!")
+    if "Выбрать товара для" in str:
+        messagebox.showerror("Ошибка выбора товара", "Вы не выбрали товара!")
     else:
         return True
     return False
 
 def CheckDevBirthDate(str):
     if str == "":
-        messagebox.showerror("Ошибка выбора даты рождения", "Вы не выбрали дату рождения разработчика!")
+        messagebox.showerror("Ошибка выбора даты рождения", "Вы не выбрали дату рождения товара!")
     else:
         return True
     return False
@@ -162,29 +162,29 @@ def CheckDevSolvedPrCount(str):
     try:
         tasks_num = int(str)
         if tasks_num < 1:
-            messagebox.showerror("Ошибка ввода числа решённых задач разработчика", "Вы ввели не положительное число решённых задач!")
+            messagebox.showerror("Ошибка ввода числа Количество товара в одном контейнере объёмом 100см^3 товара", "Вы ввели не положительное число Количество товара в одном контейнере объёмом 100см^3!")
             return False
         return True
     except ValueError:
-        messagebox.showerror("Ошибка ввода числа решённых задач разработчика", "Вы ввели не целое число решённых задач!")
+        messagebox.showerror("Ошибка ввода числа Количество товара в одном контейнере объёмом 100см^3 товара", "Вы ввели не целое число Количество товара в одном контейнере объёмом 100см^3!")
         return False
 
 def CheckDevRating(str):
     try:
         rating = float(str)
         if rating < 0.0:
-            messagebox.showerror("Ошибка ввода рейтинга", "Вы ввели отрицательное значение рейтинга разработчика!")
+            messagebox.showerror("Ошибка ввода Стоимость товараа", "Вы ввели отрицательное значение Стоимость товараа товара!")
             return False
         if rating > 10.0:
-            messagebox.showerror("Ошибка ввода рейтинга", "Вы ввели значение рейтинга, превышающее максимальное! (> 10.0)")
+            messagebox.showerror("Ошибка ввода Стоимость товараа", "Вы ввели значение Стоимость товараа, превышающее максимальное! (> 10.0)")
             return False
         return True
     except ValueError:
-        messagebox.showerror("Ошибка ввода рейтинга", "В поле для рейтинга разработчика вы ввели не число!")
+        messagebox.showerror("Ошибка ввода Стоимость товараа", "В поле для Стоимость товараа товара вы ввели не число!")
         return False
 
 def Select_Data():
-    if Var_OutputMenu.get() == "Проекты":
+    if Var_OutputMenu.get() == "полки":
         for row in Table_Projects_output.get_children():
             Table_Projects_output.delete(row)
         cur.execute("SELECT * FROM projects")
@@ -207,7 +207,7 @@ def Select_Data():
             Table_Projects_output.insert('', tk.END,
                                          values=tuple([str[1], devFIOs_list[i], str[3], str[4], str[5], dsc_text]))
             i += 1
-    elif Var_OutputMenu.get() == "Разработчики":
+    elif Var_OutputMenu.get() == "товар":
         for row in Table_Developers_output.get_children():
             Table_Developers_output.delete(row)
         cur.execute("SELECT * FROM developers")
@@ -223,7 +223,7 @@ def Start_Any_Operation():
     Btn_Edit_Data["state"] = "disabled"
     Btn_Delete_Data["state"] = "disabled"
     Btn_Cancel.place(relx=0.12, rely=0.93, anchor="c")
-    if Var_OutputMenu.get() == "Проекты":
+    if Var_OutputMenu.get() == "полки":
         Table_Projects_output.place_forget()
         Table_Projects_output_scroll.place_forget()
         Lbl_Enter_Project_Name.place(relx=0.188, rely=0.27, anchor="c")
@@ -238,7 +238,7 @@ def Start_Any_Operation():
         Text_Enter_Project_or_Dev_Description.place(relx=0.481, rely=0.79, anchor="c")
         Description_scroll.place(relx=0.305, rely=0.73, height=107, width=25)
         Lbl_Enter_Description_Additional.place(relx=0.19, rely=0.82, anchor="c")
-    elif Var_OutputMenu.get() == "Разработчики":
+    elif Var_OutputMenu.get() == "товар":
         Table_Developers_output.place_forget()
         Table_Developers_output_scroll.place_forget()
         Lbl_Enter_Dev_Name.place(relx=0.184, rely=0.3, anchor="c")
@@ -295,7 +295,7 @@ def Finish_Any_Operation():
     Text_Enter_Project_or_Dev_Description.place_forget()
     Text_Enter_Project_or_Dev_Description.delete(1.0, tk.END)
     Lbl_Enter_Description_Additional.place_forget()
-    if Var_OutputMenu.get() == "Проекты":
+    if Var_OutputMenu.get() == "полки":
         Update_option_menu(OutputMenu_Choose_Project_or_Dev, ProjectsList, Var_OutputMenu_Projects_or_Devs)
         Lbl_Enter_Project_Name.place_forget()
         Lbl_Enter_Project_LeaderFIO.place_forget()
@@ -310,7 +310,7 @@ def Finish_Any_Operation():
             Table_Projects_output.delete(row)
         Table_Projects_output_scroll.place(relx=0.003, rely=0.14, height=727, width=25)
         Table_Projects_output.place(relx=0.02, rely=0.14)
-    elif Var_OutputMenu.get() == "Разработчики":
+    elif Var_OutputMenu.get() == "товар":
         Update_option_menu(OutputMenu_Choose_Project_or_Dev, DevsList, Var_OutputMenu_Projects_or_Devs)
         Lbl_Enter_Dev_Name.place_forget()
         Lbl_Enter_Dev_BirthDate.place_forget()
@@ -326,7 +326,7 @@ CalWindow = tk.Toplevel(MainWindow)
 CalWindow.title("Выбрать дату из календаря")
 CalWindow.geometry("500x300")
 CalWindow.resizable(width=False, height=False)
-CalWindow["bg"] = "#DDA0DD"
+CalWindow["bg"] = "#20B2AA"
 CalWindow.withdraw()
 
 def Close_Cal_Window():
@@ -351,13 +351,13 @@ def Choose_Date():
     Btn_Cancel["state"] = "disabled"
     CalWindow.deiconify()
     Lbl_Choose_Date_From_Calendar = tk.Label(CalWindow, text='Выберите дату:',
-                                             font=("Arial Bold", 28), bg="#DDA0DD")
+                                             font=("Arial Bold", 28), bg="#20B2AA")
     Lbl_Choose_Date_From_Calendar.place(relx=0.5, rely=0.1, anchor="c")
-    cal = DateEntry(CalWindow, font=("Arial Bold", 28), width=15, background='#BA55D3', borderwidth=7, state="readonly",
+    cal = DateEntry(CalWindow, font=("Arial Bold", 28), width=15, background='#008B8B', borderwidth=7, state="readonly",
                     textvariable=Var_Edit_Chosen_ProjectCreationDate_or_DevBirthDate)
     cal.place(relx=0.5, rely=0.3, anchor="c")
     Btn_Confirm_Chosen_Date = tk.Button(CalWindow, text="Подтвердить дату", font=("Arial Bold", 24), bd=10,
-                                        background="#BA55D3", command=Close_Cal_Window, width=20)
+                                        background="#008B8B", command=Close_Cal_Window, width=20)
     Btn_Confirm_Chosen_Date.place(relx=0.5, rely=0.7, anchor="c")
 
 def Add_Data():
@@ -366,17 +366,17 @@ def Add_Data():
     Start_Any_Operation()
     Lbl_Add_Data.place(relx=0.34, rely=0.18, anchor="c")
     Btn_Add_Data_Commit.place(relx=0.47, rely=0.925, anchor="c")
-    if Var_OutputMenu.get() == "Проекты":
-        Var_OutputMenu_Devs.set("Выбрать лидера проекта")
+    if Var_OutputMenu.get() == "полки":
+        Var_OutputMenu_Devs.set("Выбрать товар для полки")
         OutputMenu_Choose_Dev.place(relx=0.47, rely=0.37, anchor="c")
         TxtEdit_Enter_ProjectName_or_DevName.place(relx=0.47, rely=0.27, anchor="c")
         Btn_Choose_Date.place(relx=0.525, rely=0.47, anchor="c")
-    elif Var_OutputMenu.get() == "Разработчики":
+    elif Var_OutputMenu.get() == "товар":
         TxtEdit_Enter_ProjectName_or_DevName.place(relx=0.47, rely=0.3, anchor="c")
         Btn_Choose_Date.place(relx=0.525, rely=0.42, anchor="c")
 
 def Add_Data_Confirm():
-    if Var_OutputMenu.get() == "Проекты":
+    if Var_OutputMenu.get() == "полки":
         prName = Var_Edit_ProjectName_or_DevName.get()
         prLeaderFIO = Var_OutputMenu_Devs.get()
         prCrDate = Var_Edit_ProjectCreationDate_or_DevBirthDate.get()
@@ -403,14 +403,14 @@ def Add_Data_Confirm():
                                     'VALUES (%s, %s, %s, %s, %s, %s, %s)',
                                     (prName, devID, prCrDate, prDevAmount, prInvests, prDescription, prLeaderFIO))
                                 messagebox.showinfo("Успешное добавление записи в базу данных",
-                                                    "Добавление записи о проекте в базу данных проведено успешно!")
+                                                    "Добавление записи о Полке в базу данных проведено успешно!")
                                 DB.commit()
                                 Finish_Any_Operation()
                             except:
                                 DB.rollback()
                                 messagebox.showerror("Ошибка при добавлении данных в базу",
                                                     "По неизвестной причине не удалось добавить данные в БД!")
-    elif Var_OutputMenu.get() == "Разработчики":
+    elif Var_OutputMenu.get() == "товар":
         devName = Var_Edit_ProjectName_or_DevName.get()
         devBirthDate = Var_Edit_ProjectCreationDate_or_DevBirthDate.get()
         devSolvedPrCount = Var_Edit_ProjectDevsAmount_or_DevSolvedPrCount.get()
@@ -433,7 +433,7 @@ def Add_Data_Confirm():
                                 'VALUES (%s, %s, %s, %s, %s)',
                                 (devName, devBirthDate, devSolvedPrCount, devRating, devDescription))
                             messagebox.showinfo("Успешное добавление записи в базу данных",
-                                                "Добавление записи о разработчике в базу данных проведено успешно!")
+                                                "Добавление записи о товаре в базу данных проведено успешно!")
                             DB.commit()
                             Finish_Any_Operation()
                         except:
@@ -447,19 +447,19 @@ def Edit_Data():
     Start_Any_Operation()
     Lbl_Edit_Data.place(relx=0.34, rely=0.18, anchor="c")
     Btn_Edit_Data_Commit.place(relx=0.47, rely=0.925, anchor="c")
-    if Var_OutputMenu.get() == "Проекты":
-        Var_OutputMenu_Projects_or_Devs.set("Выбрать проект для изменений")
-        Var_OutputMenu_Devs.set("Выбрать лидера проекта")
+    if Var_OutputMenu.get() == "полки":
+        Var_OutputMenu_Projects_or_Devs.set("Выбрать полку для изменений")
+        Var_OutputMenu_Devs.set("Выбрать товар для полки")
         OutputMenu_Choose_Project_or_Dev.place(relx=0.47, rely=0.27, anchor="c")
         OutputMenu_Choose_Dev.place(relx=0.47, rely=0.37, anchor="c")
         Btn_Choose_Date.place(relx=0.525, rely=0.47, anchor="c")
-    elif Var_OutputMenu.get() == "Разработчики":
-        Var_OutputMenu_Projects_or_Devs.set("Выбрать разработчика для изменений")
+    elif Var_OutputMenu.get() == "товар":
+        Var_OutputMenu_Projects_or_Devs.set("Выбрать товара для изменений")
         OutputMenu_Choose_Project_or_Dev.place(relx=0.47, rely=0.3, anchor="c")
         Btn_Choose_Date.place(relx=0.525, rely=0.42, anchor="c")
 
 def Edit_Data_Confirm():
-    if Var_OutputMenu.get() == "Проекты":
+    if Var_OutputMenu.get() == "полки":
         prName = Var_OutputMenu_Projects_or_Devs.get()
         prLeaderFIO = Var_OutputMenu_Devs.get()
         prCrDate = Var_Edit_ProjectCreationDate_or_DevBirthDate.get()
@@ -487,14 +487,14 @@ def Edit_Data_Confirm():
                                     'prInvests = %s, prDescript = %s, prOldLeaderFIO = %s WHERE prID = %s',
                                     (prName, devID, prCrDate, prDevAmount, prInvests, prDescription, prLeaderFIO, prID))
                                 messagebox.showinfo("Успешное редактирование записи в базе данных",
-                                                    "Редактирование записи о проекте в базе данных проведено успешно!")
+                                                    "Редактирование записи о Полке в базе данных проведено успешно!")
                                 DB.commit()
                                 Finish_Any_Operation()
                             except:
                                 DB.rollback()
                                 messagebox.showerror("Ошибка при редактировании данных в базу",
                                                     "По неизвестной причине не удалось редактировать данные в БД!")
-    elif Var_OutputMenu.get() == "Разработчики":
+    elif Var_OutputMenu.get() == "товар":
         devName = Var_OutputMenu_Projects_or_Devs.get()
         devBirthDate = Var_Edit_ProjectCreationDate_or_DevBirthDate.get()
         devSolvedPrCount = Var_Edit_ProjectDevsAmount_or_DevSolvedPrCount.get()
@@ -519,7 +519,7 @@ def Edit_Data_Confirm():
                                 'devRating = %s, devDescript = %s WHERE devID = %s',
                                 (devName, devBirthDate, int(devSolvedPrCount), float(devRating), devDescription, devID))
                             messagebox.showinfo("Успешное редактирование записи в базе данных",
-                                                "Редактирование записи о разработчике в базе данных проведено успешно!")
+                                                "Редактирование записи о товаре в базе данных проведено успешно!")
                             DB.commit()
                             Finish_Any_Operation()
                         except:
@@ -533,42 +533,42 @@ def Delete_Data():
     Start_Any_Operation()
     Lbl_Delete_Data.place(relx=0.34, rely=0.18, anchor="c")
     Btn_Delete_Data_Commit.place(relx=0.47, rely=0.925, anchor="c")
-    if Var_OutputMenu.get() == "Проекты":
-        Var_OutputMenu_Projects_or_Devs.set("Выбрать проект для удаления")
+    if Var_OutputMenu.get() == "полки":
+        Var_OutputMenu_Projects_or_Devs.set("Выбрать полку для удаления")
         OutputMenu_Choose_Project_or_Dev.place(relx=0.47, rely=0.27, anchor="c")
         TxtEdit_LeaderFIO.place(relx=0.47, rely=0.37, anchor="c")
         TxtEdit_LeaderFIO["state"] = "readonly"
         TxtEdit_Enter_ProjectDevsAmount_or_DevSolvedPrCount["state"] = "readonly"
         TxtEdit_Enter_ProjectInvestments_or_DevRating["state"] = "readonly"
         Text_Enter_Project_or_Dev_Description["state"] = "disable"
-    elif Var_OutputMenu.get() == "Разработчики":
-        Var_OutputMenu_Projects_or_Devs.set("Выбрать разработчика для удаления")
+    elif Var_OutputMenu.get() == "товар":
+        Var_OutputMenu_Projects_or_Devs.set("Выбрать товара для удаления")
         OutputMenu_Choose_Project_or_Dev.place(relx=0.47, rely=0.3, anchor="c")
         TxtEdit_Enter_ProjectDevsAmount_or_DevSolvedPrCount["state"] = "readonly"
         TxtEdit_Enter_ProjectInvestments_or_DevRating["state"] = "readonly"
         Text_Enter_Project_or_Dev_Description["state"] = "disable"
 
 def Delete_Data_Confirm():
-    if Var_OutputMenu.get() == "Проекты":
+    if Var_OutputMenu.get() == "полки":
         prName = Var_OutputMenu_Projects_or_Devs.get()
         if CheckIfProjectChosen(prName):
             try:
                 cur.execute("DELETE FROM projects WHERE prName = %s", prName)
                 messagebox.showinfo("Успешное удаление записи из базы данных",
-                                    "Удаление записи о проекте из базы данных проведено успешно!")
+                                    "Удаление записи о Полке из базы данных проведено успешно!")
                 DB.commit()
                 Finish_Any_Operation()
             except:
                 DB.rollback()
                 messagebox.showerror("Ошибка при удалении данных из базы",
                                      "По неизвестной причине не удалось удалить данные в БД!")
-    elif Var_OutputMenu.get() == "Разработчики":
+    elif Var_OutputMenu.get() == "товар":
         devName = Var_OutputMenu_Projects_or_Devs.get()
         if CheckIfDevChosen(devName):
             try:
                 cur.execute("DELETE FROM developers WHERE devFIO = %s", devName)
                 messagebox.showinfo("Успешное удаление записи из базы данных",
-                                    "Удаление записи о разработчике из базы данных проведено успешно!")
+                                    "Удаление записи о товаре из базы данных проведено успешно!")
                 DB.commit()
                 Finish_Any_Operation()
             except:
@@ -580,8 +580,8 @@ def Project_or_Dev_For_Delete_Chosen(*args):
     global operation_state
     if operation_state == "delete":
         pr_or_dev_Name = Var_OutputMenu_Projects_or_Devs.get()
-        if Var_OutputMenu.get() == "Проекты":
-            if "Выбрать проект для" not in pr_or_dev_Name:
+        if Var_OutputMenu.get() == "полки":
+            if "Выбрать полку для" not in pr_or_dev_Name:
                 cur.execute("SELECT * FROM projects WHERE prName = %s", pr_or_dev_Name)
                 pr_info = cur.fetchall()
                 leader_id = pr_info[0][2]
@@ -594,8 +594,8 @@ def Project_or_Dev_For_Delete_Chosen(*args):
                 Text_Enter_Project_or_Dev_Description.delete(1.0, tk.END)
                 Text_Enter_Project_or_Dev_Description.insert(tk.END, pr_info[0][6])
                 Text_Enter_Project_or_Dev_Description["state"] = "disable"
-        elif Var_OutputMenu.get() == "Разработчики":
-            if "Выбрать разработчика для" not in pr_or_dev_Name:
+        elif Var_OutputMenu.get() == "товар":
+            if "Выбрать товара для" not in pr_or_dev_Name:
                 cur.execute("SELECT * FROM developers WHERE devFIO = %s", pr_or_dev_Name)
                 pr_or_dev_info = cur.fetchall()
                 Var_Edit_ProjectCreationDate_or_DevBirthDate.set(str(pr_or_dev_info[0][2]))
@@ -608,23 +608,21 @@ def Project_or_Dev_For_Delete_Chosen(*args):
 
 Var_OutputMenu_Projects_or_Devs.trace("w", Project_or_Dev_For_Delete_Chosen)
 
-Lbl_FIO = tk.Label(MainWindow, text="Жуковский Павел Сергеевич, 3 курс, 12 группа, 2021 год",
-                   font=("Arial Bold", 18), bg="#DDA0DD")
+Lbl_FIO = tk.Label(MainWindow, text="Система учёта товаров на складе",
+                   font=("Arial Bold", 28), bg="#20B2AA")
 Lbl_FIO.place(relx=0.215, rely=0.025, anchor="c")
 
-Lbl_Start = tk.Label(MainWindow, text='Лабораторная "Модуль справочников v202102"\n\n'
-                                      'Сделано для Баровика Дмитрия Валентиновича\n\n'
+Lbl_Start = tk.Label(MainWindow, text='Программа для ручного учёта товаров на складе\n\n'
+                                      'База данных автоматически изменяется со временем\n\n'
                                       'Язык программирования: Python\n\n'
                                       'Технологии: Tkinter, pymysql\n\n'
-                                      'Среда разработки: PyCharm\n\n'
-                                      'Разработчик программы: Жуковский Павел Сергеевич\n'
-                                      '3 курс, 12 группа, 2021 год',
-                     font=("Times New Roman", 32), bg="#DDA0DD")
+                                      'Среда разработки: PyCharm\n\n',
+                     font=("Times New Roman", 32), bg="#20B2AA")
 Lbl_Start.place(relx=0.33, rely=0.5, anchor="c")
 
 def Dir_Chosen(*args):
     Lbl_Start.place_forget()
-    if Var_OutputMenu.get() == "Проекты":
+    if Var_OutputMenu.get() == "полки":
         UpdateProjectsList()
         Update_option_menu(OutputMenu_Choose_Project_or_Dev, ProjectsList, Var_OutputMenu_Projects_or_Devs)
         OutputMenu_Choose_Project_or_Dev.config(font=("Times New Roman", 24), width=29)
@@ -636,7 +634,7 @@ def Dir_Chosen(*args):
         Lbl_Dir_Projects.place(relx=0.34, rely=0.1, anchor="c")
         Table_Projects_output_scroll.place(relx=0.003, rely=0.14, height=727, width=25)
         Table_Projects_output.place(relx=0.02, rely=0.14)
-    elif Var_OutputMenu.get() == "Разработчики":
+    elif Var_OutputMenu.get() == "товар":
         UpdateDevelopersList()
         Update_option_menu(OutputMenu_Choose_Project_or_Dev, DevsList, Var_OutputMenu_Projects_or_Devs)
         OutputMenu_Choose_Project_or_Dev.config(font=("Times New Roman", 18), width=39)
@@ -654,120 +652,120 @@ def Dir_Chosen(*args):
     Btn_Delete_Data["state"] = "normal"
 
 Lbl_ChooseDir = tk.Label(MainWindow, text="Выберите интересующий вас справочник:",
-                         font=("Arial Bold", 18), bg="#DDA0DD")
+                         font=("Arial Bold", 18), bg="#20B2AA")
 Lbl_ChooseDir.place(relx=0.83, rely=0.07, anchor="c")
 
-OutputMenu_ChooseDir = tk.OptionMenu(MainWindow, Var_OutputMenu, "Проекты", "Разработчики")
-OutputMenu_ChooseDir.config(font=("Times New Roman", 28), bg="#BA55D3", bd=5, width=20)
+OutputMenu_ChooseDir = tk.OptionMenu(MainWindow, Var_OutputMenu, "полки", "товар")
+OutputMenu_ChooseDir.config(font=("Times New Roman", 28), bg="#008B8B", bd=5, width=20)
 OutputMenu_ChooseDir.place(relx=0.83, rely=0.14, anchor="c")
 
 Var_OutputMenu.trace("w", Dir_Chosen)
 
 Btn_Select_Data = tk.Button(MainWindow, text="Вывести все записи", font=("Arial Bold", 28), bd=10,
-                            background="#BA55D3", command=Select_Data, width=20, state="disabled")
+                            background="#008B8B", command=Select_Data, width=20, state="disabled")
 Btn_Select_Data.place(relx=0.83, rely=0.34, anchor="c")
 
 Lbl_Add_Data = tk.Label(MainWindow, text='Добавление записи',
-                        font=("Arial Bold", 36), bg="#DDA0DD")
+                        font=("Arial Bold", 36), bg="#20B2AA")
 
 Lbl_Edit_Data = tk.Label(MainWindow, text='Редактирование записи',
-                         font=("Arial Bold", 36), bg="#DDA0DD")
+                         font=("Arial Bold", 36), bg="#20B2AA")
 
 Lbl_Delete_Data = tk.Label(MainWindow, text='Удаление записи',
-                           font=("Arial Bold", 36), bg="#DDA0DD")
+                           font=("Arial Bold", 36), bg="#20B2AA")
 
-Lbl_Enter_Project_Name = tk.Label(MainWindow, text='Название проекта:',
-                                  font=("Arial Bold", 28), bg="#DDA0DD")
+Lbl_Enter_Project_Name = tk.Label(MainWindow, text='Название полки:',
+                                  font=("Arial Bold", 28), bg="#20B2AA")
 
-Lbl_Enter_Dev_Name = tk.Label(MainWindow, text='ФИО разработчика:',
-                                  font=("Arial Bold", 28), bg="#DDA0DD")
+Lbl_Enter_Dev_Name = tk.Label(MainWindow, text='Название товара:',
+                                  font=("Arial Bold", 28), bg="#20B2AA")
 
 TxtEdit_Enter_ProjectName_or_DevName = tk.Entry(MainWindow, width=34, bd=5, font=("Arial Bold", 20),
                                                 textvariable=Var_Edit_ProjectName_or_DevName)
 
 OutputMenu_Choose_Project_or_Dev = tk.OptionMenu(MainWindow, Var_OutputMenu_Projects_or_Devs, *ProjectsList)
-OutputMenu_Choose_Project_or_Dev.config(font=("Times New Roman", 24), bg="#BA55D3", bd=5, width=29)
+OutputMenu_Choose_Project_or_Dev.config(font=("Times New Roman", 24), bg="#008B8B", bd=5, width=29)
 
-Lbl_Enter_Project_LeaderFIO = tk.Label(MainWindow, text='ФИО лидера проекта:',
-                                       font=("Arial Bold", 28), bg="#DDA0DD")
+Lbl_Enter_Project_LeaderFIO = tk.Label(MainWindow, text='Название товара для полки:',
+                                       font=("Arial Bold", 23), bg="#20B2AA")
 
 TxtEdit_LeaderFIO = tk.Entry(MainWindow, width=34, bd=5, font=("Arial Bold", 20),
                                     textvariable=Var_Edit_LeaderFIO)
 
 OutputMenu_Choose_Dev = tk.OptionMenu(MainWindow, Var_OutputMenu_Devs, *DevsList)
-OutputMenu_Choose_Dev.config(font=("Times New Roman", 24), bg="#BA55D3", bd=5, width=29)
+OutputMenu_Choose_Dev.config(font=("Times New Roman", 24), bg="#008B8B", bd=5, width=29)
 
-Lbl_Enter_Project_CreationDate = tk.Label(MainWindow, text='Дата создания проекта:',
-                                          font=("Arial Bold", 28), bg="#DDA0DD")
+Lbl_Enter_Project_CreationDate = tk.Label(MainWindow, text='Дата последнего изменения на полке:',
+                                          font=("Arial Bold", 18), bg="#20B2AA")
 
-Lbl_Enter_Dev_BirthDate = tk.Label(MainWindow, text='Дата рождения:',
-                                          font=("Arial Bold", 28), bg="#DDA0DD")
+Lbl_Enter_Dev_BirthDate = tk.Label(MainWindow, text='Срок годности:',
+                                          font=("Arial Bold", 28), bg="#20B2AA")
 
 TxtEdit_Enter_ProjectCreationDate_or_DevBirthDate = tk.Entry(MainWindow, width=10, bd=5, font=("Arial Bold", 20),
                                                              textvariable=Var_Edit_ProjectCreationDate_or_DevBirthDate,
                                                              state="readonly")
 
 Btn_Choose_Date = tk.Button(MainWindow, text="Выбрать дату", font=("Arial Bold", 22), bd=10,
-                            background="#BA55D3", command=Choose_Date, width=18)
+                            background="#008B8B", command=Choose_Date, width=18)
 
-Lbl_Enter_Project_DevsAmount = tk.Label(MainWindow, text='Число разработчиков:',
-                                        font=("Arial Bold", 28), bg="#DDA0DD")
+Lbl_Enter_Project_DevsAmount = tk.Label(MainWindow, text='Количество контейнеров объёмом 100см^3:',
+                                        font=("Arial Bold", 15), bg="#20B2AA")
 
-Lbl_Enter_Dev_SolvedPrCount = tk.Label(MainWindow, text='Число решённых задач:',
-                                        font=("Arial Bold", 28), bg="#DDA0DD")
+Lbl_Enter_Dev_SolvedPrCount = tk.Label(MainWindow, text='Количество товара в одном контейнере(100см^3):',
+                                        font=("Arial Bold", 14), bg="#20B2AA")
 
 TxtEdit_Enter_ProjectDevsAmount_or_DevSolvedPrCount = tk.Entry(MainWindow, width=34, bd=5, font=("Arial Bold", 20),
                                                                textvariable=Var_Edit_ProjectDevsAmount_or_DevSolvedPrCount)
 
-Lbl_Enter_Project_Investments = tk.Label(MainWindow, text='Инвестиции проекта:',
-                                         font=("Arial Bold", 28), bg="#DDA0DD")
+Lbl_Enter_Project_Investments = tk.Label(MainWindow, text='Длина полки в см:',
+                                         font=("Arial Bold", 24), bg="#20B2AA")
 
-Lbl_Enter_Dev_Rating = tk.Label(MainWindow, text='Рейтинг:',
-                                         font=("Arial Bold", 28), bg="#DDA0DD")
+Lbl_Enter_Dev_Rating = tk.Label(MainWindow, text='Стоимость товара:',
+                                         font=("Arial Bold", 14), bg="#20B2AA")
 
 TxtEdit_Enter_ProjectInvestments_or_DevRating = tk.Entry(MainWindow, width=34, bd=5, font=("Arial Bold", 20),
                                                          textvariable=Var_Edit_ProjectInvests_or_DevRating)
 
-Lbl_Enter_Project_Description = tk.Label(MainWindow, text='Описание проекта:',
-                                         font=("Arial Bold", 28), bg="#DDA0DD")
+Lbl_Enter_Project_Description = tk.Label(MainWindow, text='Описание устройства отслеживания полки:',
+                                         font=("Arial Bold", 13), bg="#20B2AA")
 
-Lbl_Enter_Dev_Description = tk.Label(MainWindow, text='Описание разработчика:',
-                                         font=("Arial Bold", 28), bg="#DDA0DD")
+Lbl_Enter_Dev_Description = tk.Label(MainWindow, text='Описание товара:',
+                                         font=("Arial Bold", 28), bg="#20B2AA")
 
 Lbl_Enter_Description_Additional = tk.Label(MainWindow, text='(не обязательно)',
-                                            font=("Arial Bold", 24), bg="#DDA0DD")
+                                            font=("Arial Bold", 13), bg="#20B2AA")
 
 Text_Enter_Project_or_Dev_Description = tk.Text(MainWindow, height=3, width=34, bd=5, font=("Times New Roman", 20))
 
 Btn_Cancel = tk.Button(MainWindow, text="Отмена", font=("Arial Bold", 24), bd=5,
-                                background="#BA55D3", command=Finish_Any_Operation, width=15)
+                                background="#008B8B", command=Finish_Any_Operation, width=15)
 
 Btn_Add_Data_Commit = tk.Button(MainWindow, text="Подтвердить добавление", font=("Arial Bold", 28), bd=10,
-                                background="#BA55D3", command=Add_Data_Confirm, width=22)
+                                background="#008B8B", command=Add_Data_Confirm, width=22)
 
 Btn_Edit_Data_Commit = tk.Button(MainWindow, text="Подтвердить изменение", font=("Arial Bold", 28), bd=10,
-                                background="#BA55D3", command=Edit_Data_Confirm, width=22)
+                                background="#008B8B", command=Edit_Data_Confirm, width=22)
 
 Btn_Delete_Data_Commit = tk.Button(MainWindow, text="Подтвердить удаление", font=("Arial Bold", 28), bd=10,
-                                background="#BA55D3", command=Delete_Data_Confirm, width=22)
+                                background="#008B8B", command=Delete_Data_Confirm, width=22)
 
 Btn_Add_Data = tk.Button(MainWindow, text="Добавить запись", font=("Arial Bold", 28), bd=10,
-                         background="#BA55D3", command=Add_Data, width=20, state="disabled")
+                         background="#008B8B", command=Add_Data, width=20, state="disabled")
 Btn_Add_Data.place(relx=0.83, rely=0.46, anchor="c")
 
 Btn_Edit_Data = tk.Button(MainWindow, text="Редактировать запись", font=("Arial Bold", 28), bd=10,
-                          background="#BA55D3", command=Edit_Data, width=20, state="disabled")
+                          background="#008B8B", command=Edit_Data, width=20, state="disabled")
 Btn_Edit_Data.place(relx=0.83, rely=0.58, anchor="c")
 
 Btn_Delete_Data = tk.Button(MainWindow, text="Удалить запись", font=("Arial Bold", 28), bd=10,
-                            background="#BA55D3", command=Delete_Data, width=20, state="disabled")
+                            background="#008B8B", command=Delete_Data, width=20, state="disabled")
 Btn_Delete_Data.place(relx=0.83, rely=0.7, anchor="c")
 
-Lbl_Dir_Projects = tk.Label(MainWindow, text='Справочник "Проекты"',
-                            font=("Arial Bold", 28), bg="#DDA0DD")
+Lbl_Dir_Projects = tk.Label(MainWindow, text='Справочник "полки"',
+                            font=("Arial Bold", 28), bg="#20B2AA")
 
-Lbl_Dir_Developers = tk.Label(MainWindow, text='Справочник "Разработчики"',
-                              font=("Arial Bold", 28), bg="#DDA0DD")
+Lbl_Dir_Developers = tk.Label(MainWindow, text='Справочник "товар"',
+                              font=("Arial Bold", 28), bg="#20B2AA")
 
 Table_Projects_output = ttk.Treeview(MainWindow, height=35, show="headings", selectmode="browse")
 Table_Projects_output["columns"] = projects_headings
@@ -823,7 +821,7 @@ Description_scroll = tk.Scrollbar(MainWindow, command=Text_Enter_Project_or_Dev_
 Text_Enter_Project_or_Dev_Description.configure(yscrollcommand=Description_scroll.set)
 
 Btn_Exit = tk.Button(MainWindow, text="Выход", font=("Arial Bold", 28), bd=10,
-                     background="#BA55D3", command=MainWindow.quit, width=20)
+                     background="#008B8B", command=MainWindow.quit, width=20)
 Btn_Exit.place(relx=0.83, rely=0.925, anchor="c")
 
 MainWindow.mainloop()
