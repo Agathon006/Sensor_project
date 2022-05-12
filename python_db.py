@@ -12,8 +12,8 @@ DB = pymysql.connect(host='localhost',
 cur = DB.cursor()  # Курсор по БД-шке
 
 projects_headings = ('Название полки', 'Название товара', 'Дата последнего изменения', 'Количество контейнеров объёмом 100см^3',
-                     'Длина полки в см (бел. руб.)', 'Описание устройства отслеживания')
-developers_headings = ('Название товара', 'Срок годности', 'Количество товара в одном контейнере объёмом 100см^3', 'Стоимость товара', 'Описание товара')
+                     'Длина полки в см', 'Описание устройства отслеживания')
+developers_headings = ('Название товара', 'Срок годности', 'Количество товара в одном контейнере(100см^3)', 'Стоимость товара', 'Описание товара')
 
 MainWindow = tk.Tk()
 MainWindow.title("Учёт товаров на складе")
@@ -225,7 +225,8 @@ def Start_Any_Operation():
     Btn_Cancel.place(relx=0.12, rely=0.93, anchor="c")
     if Var_OutputMenu.get() == "полки":
         Table_Projects_output.place_forget()
-        Table_Projects_output_scroll.place_forget()
+        Table_Projects_output_scroll_vertical.place_forget()
+        Table_Projects_output_scroll_horizontal.place_forget()
         Lbl_Enter_Project_Name.place(relx=0.188, rely=0.27, anchor="c")
         Lbl_Enter_Project_LeaderFIO.place(relx=0.17, rely=0.37, anchor="c")
         Lbl_Enter_Project_CreationDate.place(relx=0.16, rely=0.47, anchor="c")
@@ -236,11 +237,13 @@ def Start_Any_Operation():
         TxtEdit_Enter_ProjectDevsAmount_or_DevSolvedPrCount.place(relx=0.47, rely=0.57, anchor="c")
         TxtEdit_Enter_ProjectInvestments_or_DevRating.place(relx=0.47, rely=0.67, anchor="c")
         Text_Enter_Project_or_Dev_Description.place(relx=0.481, rely=0.79, anchor="c")
-        Description_scroll.place(relx=0.305, rely=0.73, height=107, width=25)
+        Description_scroll_vertical.place(relx=0.305, rely=0.73, height=107, width=25)
+        Description_scroll_horizontal.place(relx=0.32, rely=0.85, height=25, width=493)
         Lbl_Enter_Description_Additional.place(relx=0.19, rely=0.82, anchor="c")
     elif Var_OutputMenu.get() == "товар":
         Table_Developers_output.place_forget()
-        Table_Developers_output_scroll.place_forget()
+        Table_Developers_output_scroll_vertical.place_forget()
+        Table_Developers_output_scroll_horizontal.place_forget()
         Lbl_Enter_Dev_Name.place(relx=0.184, rely=0.3, anchor="c")
         Lbl_Enter_Dev_BirthDate.place(relx=0.205, rely=0.42, anchor="c")
         Lbl_Enter_Dev_SolvedPrCount.place(relx=0.159, rely=0.54, anchor="c")
@@ -251,7 +254,8 @@ def Start_Any_Operation():
         TxtEdit_Enter_ProjectDevsAmount_or_DevSolvedPrCount.place(relx=0.47, rely=0.54, anchor="c")
         TxtEdit_Enter_ProjectInvestments_or_DevRating.place(relx=0.47, rely=0.66, anchor="c")
         Text_Enter_Project_or_Dev_Description.place(relx=0.481, rely=0.78, anchor="c")
-        Description_scroll.place(relx=0.305, rely=0.719, height=107, width=25)
+        Description_scroll_vertical.place(relx=0.305, rely=0.719, height=107, width=25)
+        Description_scroll_horizontal.place(relx=0.32, rely=0.85, height=25, width=493)
 
 def Update_option_menu(curr_menu, new_list, var_str):
     new_menu = curr_menu["menu"]
@@ -285,7 +289,8 @@ def Finish_Any_Operation():
     Var_Edit_ProjectDevsAmount_or_DevSolvedPrCount.set("")
     TxtEdit_Enter_ProjectInvestments_or_DevRating.place_forget()
     Var_Edit_ProjectInvests_or_DevRating.set("")
-    Description_scroll.place_forget()
+    Description_scroll_vertical.place_forget()
+    Description_scroll_horizontal.place_forget()
     Btn_Add_Data_Commit.place_forget()
     Btn_Edit_Data_Commit.place_forget()
     Btn_Delete_Data_Commit.place_forget()
@@ -308,7 +313,8 @@ def Finish_Any_Operation():
         TxtEdit_LeaderFIO["state"] = "normal"
         for row in Table_Projects_output.get_children():
             Table_Projects_output.delete(row)
-        Table_Projects_output_scroll.place(relx=0.003, rely=0.14, height=727, width=25)
+        Table_Projects_output_scroll_vertical.place(relx=0.003, rely=0.14, height=706, width=25)
+        Table_Projects_output_scroll_horizontal.place(relx=0.02, rely=0.96, height=25, width=993)
         Table_Projects_output.place(relx=0.02, rely=0.14)
     elif Var_OutputMenu.get() == "товар":
         Update_option_menu(OutputMenu_Choose_Project_or_Dev, DevsList, Var_OutputMenu_Projects_or_Devs)
@@ -319,7 +325,8 @@ def Finish_Any_Operation():
         Lbl_Enter_Dev_Description.place_forget()
         for row in Table_Developers_output.get_children():
             Table_Developers_output.delete(row)
-        Table_Developers_output_scroll.place(relx=0.003, rely=0.14, height=727, width=25)
+        Table_Developers_output_scroll_vertical.place(relx=0.003, rely=0.14, height=706, width=25)
+        Table_Developers_output_scroll_horizontal.place(relx=0.02, rely=0.96, height=25, width=993)
         Table_Developers_output.place(relx=0.02, rely=0.14)
 
 CalWindow = tk.Toplevel(MainWindow)
@@ -627,24 +634,28 @@ def Dir_Chosen(*args):
         Update_option_menu(OutputMenu_Choose_Project_or_Dev, ProjectsList, Var_OutputMenu_Projects_or_Devs)
         OutputMenu_Choose_Project_or_Dev.config(font=("Times New Roman", 24), width=29)
         Lbl_Dir_Developers.place_forget()
-        Table_Developers_output_scroll.place_forget()
+        Table_Developers_output_scroll_vertical.place_forget()
+        Table_Developers_output_scroll_horizontal.place_forget()
         Table_Developers_output.place_forget()
         for row in Table_Projects_output.get_children():
             Table_Projects_output.delete(row)
         Lbl_Dir_Projects.place(relx=0.34, rely=0.1, anchor="c")
-        Table_Projects_output_scroll.place(relx=0.003, rely=0.14, height=727, width=25)
+        Table_Projects_output_scroll_vertical.place(relx=0.003, rely=0.14, height=706, width=25)
+        Table_Projects_output_scroll_horizontal.place(relx=0.02, rely=0.96, height=25, width=993)
         Table_Projects_output.place(relx=0.02, rely=0.14)
     elif Var_OutputMenu.get() == "товар":
         UpdateDevelopersList()
         Update_option_menu(OutputMenu_Choose_Project_or_Dev, DevsList, Var_OutputMenu_Projects_or_Devs)
         OutputMenu_Choose_Project_or_Dev.config(font=("Times New Roman", 18), width=39)
         Lbl_Dir_Projects.place_forget()
-        Table_Projects_output_scroll.place_forget()
+        Table_Projects_output_scroll_vertical.place_forget()
+        Table_Projects_output_scroll_horizontal.place_forget()
         Table_Projects_output.place_forget()
         for row in Table_Developers_output.get_children():
             Table_Developers_output.delete(row)
         Lbl_Dir_Developers.place(relx=0.34, rely=0.1, anchor="c")
-        Table_Developers_output_scroll.place(relx=0.003, rely=0.14, height=727, width=25)
+        Table_Developers_output_scroll_vertical.place(relx=0.003, rely=0.14, height=706, width=25)
+        Table_Developers_output_scroll_horizontal.place(relx=0.02, rely=0.96, height=25, width=993)
         Table_Developers_output.place(relx=0.02, rely=0.14)
     Btn_Select_Data["state"] = "normal"
     Btn_Add_Data["state"] = "normal"
@@ -767,21 +778,21 @@ Lbl_Dir_Projects = tk.Label(MainWindow, text='Справочник "полки"'
 Lbl_Dir_Developers = tk.Label(MainWindow, text='Справочник "товар"',
                               font=("Arial Bold", 28), bg="#20B2AA")
 
-Table_Projects_output = ttk.Treeview(MainWindow, height=35, show="headings", selectmode="browse")
+Table_Projects_output = ttk.Treeview(MainWindow, height=34, show="headings", selectmode="browse")
 Table_Projects_output["columns"] = projects_headings
 Table_Projects_output["displaycolumns"] = projects_headings
 Table_Projects_output.heading(projects_headings[0], text=projects_headings[0], anchor=tk.CENTER)
-Table_Projects_output.column(projects_headings[0], width=180, anchor=tk.CENTER)
+Table_Projects_output.column(projects_headings[0], width=115, anchor=tk.CENTER)
 Table_Projects_output.heading(projects_headings[1], text=projects_headings[1], anchor=tk.CENTER)
-Table_Projects_output.column(projects_headings[1], width=200, anchor=tk.CENTER)
+Table_Projects_output.column(projects_headings[1], width=115, anchor=tk.CENTER)
 Table_Projects_output.heading(projects_headings[2], text=projects_headings[2], anchor=tk.CENTER)
-Table_Projects_output.column(projects_headings[2], width=85, anchor=tk.CENTER)
+Table_Projects_output.column(projects_headings[2], width=175, anchor=tk.CENTER)
 Table_Projects_output.heading(projects_headings[3], text=projects_headings[3], anchor=tk.CENTER)
-Table_Projects_output.column(projects_headings[3], width=160, anchor=tk.CENTER)
+Table_Projects_output.column(projects_headings[3], width=255, anchor=tk.CENTER)
 Table_Projects_output.heading(projects_headings[4], text=projects_headings[4], anchor=tk.CENTER)
-Table_Projects_output.column(projects_headings[4], width=135, anchor=tk.CENTER)
+Table_Projects_output.column(projects_headings[4], width=120, anchor=tk.CENTER)
 Table_Projects_output.heading(projects_headings[5], text=projects_headings[5], anchor=tk.CENTER)
-Table_Projects_output.column(projects_headings[5], width=230, anchor=tk.CENTER)
+Table_Projects_output.column(projects_headings[5], width=210, anchor=tk.CENTER)
 Table_Projects_output.column('#' + str(1), minwidth=180, stretch=False)
 Table_Projects_output.column('#' + str(2), minwidth=200, stretch=False)
 Table_Projects_output.column('#' + str(3), minwidth=85, stretch=False)
@@ -789,36 +800,44 @@ Table_Projects_output.column('#' + str(4), minwidth=160, stretch=False)
 Table_Projects_output.column('#' + str(5), minwidth=135, stretch=False)
 Table_Projects_output.column('#' + str(6), minwidth=230, stretch=False)
 
-Table_Developers_output = ttk.Treeview(MainWindow, height=35, show="headings", selectmode="browse")
+Table_Developers_output = ttk.Treeview(MainWindow, height=34, show="headings", selectmode="browse")
 Table_Developers_output["columns"] = developers_headings
 Table_Developers_output["displaycolumns"] = developers_headings
 Table_Developers_output.heading(developers_headings[0], text=developers_headings[0], anchor=tk.CENTER)
-Table_Developers_output.column(developers_headings[0], width=300, anchor=tk.CENTER)
+Table_Developers_output.column(developers_headings[0], width=200, anchor=tk.CENTER)
 Table_Developers_output.heading(developers_headings[1], text=developers_headings[1], anchor=tk.CENTER)
 Table_Developers_output.column(developers_headings[1], width=100, anchor=tk.CENTER)
 Table_Developers_output.heading(developers_headings[2], text=developers_headings[2], anchor=tk.CENTER)
-Table_Developers_output.column(developers_headings[2], width=160, anchor=tk.CENTER)
+Table_Developers_output.column(developers_headings[2], width=300, anchor=tk.CENTER)
 Table_Developers_output.heading(developers_headings[3], text=developers_headings[3], anchor=tk.CENTER)
-Table_Developers_output.column(developers_headings[3], width=100, anchor=tk.CENTER)
+Table_Developers_output.column(developers_headings[3], width=130, anchor=tk.CENTER)
 Table_Developers_output.heading(developers_headings[4], text=developers_headings[4], anchor=tk.CENTER)
-Table_Developers_output.column(developers_headings[4], width=330, anchor=tk.CENTER)
+Table_Developers_output.column(developers_headings[4], width=260, anchor=tk.CENTER)
 Table_Developers_output.column('#' + str(1), minwidth=300, stretch=False)
 Table_Developers_output.column('#' + str(2), minwidth=100, stretch=False)
 Table_Developers_output.column('#' + str(3), minwidth=160, stretch=False)
 Table_Developers_output.column('#' + str(4), minwidth=100, stretch=False)
 Table_Developers_output.column('#' + str(5), minwidth=330, stretch=False)
 
-Table_Projects_output_scroll = tk.Scrollbar(MainWindow, command=Table_Projects_output.yview)
+Table_Projects_output_scroll_vertical = tk.Scrollbar(MainWindow, command=Table_Projects_output.yview)
+Table_Projects_output.configure(yscrollcommand=Table_Projects_output_scroll_vertical.set)
 
-Table_Projects_output.configure(yscrollcommand=Table_Projects_output_scroll.set)
+Table_Developers_output_scroll_vertical = tk.Scrollbar(MainWindow, command=Table_Developers_output.yview)
+Table_Developers_output.configure(yscrollcommand=Table_Developers_output_scroll_vertical.set)
 
-Table_Developers_output_scroll = tk.Scrollbar(MainWindow, command=Table_Developers_output.yview)
+Description_scroll_vertical = tk.Scrollbar(MainWindow, command=Text_Enter_Project_or_Dev_Description.yview)
+Text_Enter_Project_or_Dev_Description.configure(yscrollcommand=Description_scroll_vertical.set)
 
-Table_Developers_output.configure(yscrollcommand=Table_Developers_output_scroll.set)
 
-Description_scroll = tk.Scrollbar(MainWindow, command=Text_Enter_Project_or_Dev_Description.yview)
+Table_Projects_output_scroll_horizontal = tk.Scrollbar(MainWindow, command=Table_Projects_output.xview, orient='horizontal')
+Table_Projects_output.configure(xscrollcommand=Table_Projects_output_scroll_horizontal.set)
 
-Text_Enter_Project_or_Dev_Description.configure(yscrollcommand=Description_scroll.set)
+Table_Developers_output_scroll_horizontal = tk.Scrollbar(MainWindow, command=Table_Developers_output.xview, orient='horizontal')
+Table_Developers_output.configure(xscrollcommand=Table_Developers_output_scroll_horizontal.set)
+
+Description_scroll_horizontal = tk.Scrollbar(MainWindow, command=Text_Enter_Project_or_Dev_Description.xview, orient='horizontal')
+Text_Enter_Project_or_Dev_Description.configure(xscrollcommand=Description_scroll_horizontal.set)
+
 
 Btn_Exit = tk.Button(MainWindow, text="Выход", font=("Arial Bold", 28), bd=10,
                      background="#008B8B", command=MainWindow.quit, width=20)
