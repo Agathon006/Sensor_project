@@ -18,8 +18,8 @@ shelfs_headings = (
     'Название полки', 'Название товара', 'Дата последнего изменения', 'Количество контейнеров объёмом 100см^3',
     'Длина полки в см', 'Описание устройства отслеживания')
 goods_headings = (
-    'Название товара', 'Срок годности', 'Количество товара в одном контейнере(100см^3)', 'Стоимость товара',
-    'Описание товара')
+    'Название товара', 'Количество товара', 'Срок годности', 'Количество товара в одном контейнере(100см^3)',
+    'Стоимость товара', 'Описание товара')
 
 MainWindow = tk.Tk()
 MainWindow.title("Учёт товаров на складе")
@@ -61,6 +61,7 @@ Var_OutputMenu.set("Выбрать справочник")
 Var_Edit_ProjectName_or_DevName = tk.StringVar(MainWindow)
 Var_OutputMenu_Shelfs_or_Devs = tk.StringVar(MainWindow)
 Var_Edit_Chosen_ProjectCreationDate_or_ShelfLife = tk.StringVar(MainWindow)
+Var_Edit_GoodQuantity = tk.StringVar(MainWindow)
 Var_Edit_ProjectCreationDate_or_ShelfLife = tk.StringVar(MainWindow)
 Var_Edit_ProjectDevsAmount_or_GoodQuantityInOneContainer = tk.StringVar(MainWindow)
 Var_Edit_ProjectInvests_or_GoodCost = tk.StringVar(MainWindow)
@@ -96,6 +97,13 @@ def CheckIfProjectChosen(str):
 def CheckLeaderFIOName(str):
     if str == "Выбрать товар для полки":
         messagebox.showerror("Ошибка ввода Название товара полки", "Вы не выбрали Название товара полки!")
+    else:
+        return True
+    return False
+
+def CheckGoodQuantity(str):
+    if str == "":
+        messagebox.showerror("Ошибка ввода количества товара", "Вы не выбрали количество товара!")
     else:
         return True
     return False
@@ -209,6 +217,7 @@ def CheckGoodCost(str):
         messagebox.showerror("Ошибка ввода Стоимость товараа", "В поле для Стоимость товараа товара вы ввели не число!")
         return False
 
+
 def Select_Data():
     sensor_data = get_sensor_data()
     if sensor_data < 20.2:
@@ -257,8 +266,8 @@ def Select_Data():
         cur.execute("SELECT * FROM goods")
         query_result = cur.fetchall()
         for str in query_result:
-            dsc_text = str[5].replace('\n', ' ')
-            Table_Goods_output.insert('', tk.END, values=tuple([str[1], str[2], str[3], str[4], dsc_text]))
+            dsc_text = str[6].replace('\n', ' ')
+            Table_Goods_output.insert('', tk.END, values=tuple([str[1], str[2], str[3], str[4], str[5], dsc_text]))
 
 
 def Start_Any_Operation():
@@ -290,12 +299,14 @@ def Start_Any_Operation():
         Table_Goods_output_scroll_vertical.place_forget()
         Table_Goods_output_scroll_horizontal.place_forget()
         Lbl_Enter_Dev_Name.place(relx=0.184, rely=0.3, anchor="c")
-        Lbl_Enter_Dev_BirthDate.place(relx=0.205, rely=0.42, anchor="c")
+        Lbl_Enter_Dev_BirthDate.place(relx=0.184, rely=0.38, anchor="c")
+        Lbl_Enter_PrCount.place(relx=0.16, rely=0.46, anchor="c")
         Lbl_Enter_Dev_SolvedPrCount.place(relx=0.159, rely=0.54, anchor="c")
         Lbl_Enter_Dev_Rating.place(relx=0.246, rely=0.66, anchor="c")
         Lbl_Enter_Dev_Description.place(relx=0.158, rely=0.77, anchor="c")
         Lbl_Enter_Description_Additional.place(relx=0.16, rely=0.82, anchor="c")
-        TxtEdit_Enter_ProjectCreationDate_or_ShelfLife.place(relx=0.353, rely=0.42, anchor="c")
+        TxtEdit_Enter_ProjectCreationDate_or_ShelfLife.place(relx=0.353, rely=0.38, anchor="c")
+        TxtEdit_Enter_Good_quantity.place(relx=0.469, rely=0.46, anchor="c")
         TxtEdit_Enter_ProjectDevsAmount_or_GoodQuantityInOneContainer.place(relx=0.47, rely=0.54, anchor="c")
         TxtEdit_Enter_ProjectInvestments_or_GoodCost.place(relx=0.47, rely=0.66, anchor="c")
         Text_Enter_Project_or_Dev_Description.place(relx=0.481, rely=0.78, anchor="c")
@@ -330,6 +341,7 @@ def Finish_Any_Operation():
     OutputMenu_Choose_Dev.place_forget()
     OutputMenu_Choose_Project_or_Dev.place_forget()
     TxtEdit_Enter_ProjectCreationDate_or_ShelfLife.place_forget()
+    Var_Edit_GoodQuantity.set("")
     Var_Edit_ProjectCreationDate_or_ShelfLife.set("")
     Btn_Choose_Date.place_forget()
     TxtEdit_Enter_ProjectDevsAmount_or_GoodQuantityInOneContainer.place_forget()
@@ -367,6 +379,7 @@ def Finish_Any_Operation():
         Update_option_menu(OutputMenu_Choose_Project_or_Dev, DevsList, Var_OutputMenu_Shelfs_or_Devs)
         Lbl_Enter_Dev_Name.place_forget()
         Lbl_Enter_Dev_BirthDate.place_forget()
+        Lbl_Enter_PrCount.place_forget()
         Lbl_Enter_Dev_SolvedPrCount.place_forget()
         Lbl_Enter_Dev_Rating.place_forget()
         Lbl_Enter_Dev_Description.place_forget()
@@ -433,47 +446,50 @@ def Add_Data():
         Btn_Choose_Date.place(relx=0.525, rely=0.47, anchor="c")
     elif Var_OutputMenu.get() == "товар":
         TxtEdit_Enter_ProjectName_or_DevName.place(relx=0.47, rely=0.3, anchor="c")
-        Btn_Choose_Date.place(relx=0.525, rely=0.42, anchor="c")
+        Btn_Choose_Date.place(relx=0.525, rely=0.38, anchor="c")
 
 
 def Add_Data_Confirm():
     if Var_OutputMenu.get() == "полки":
         shelfName = Var_Edit_ProjectName_or_DevName.get()
         prLeaderFIO = Var_OutputMenu_Devs.get()
+        prGoodQuantity = Var_Edit_GoodQuantity.get()
         prCrDate = Var_Edit_ProjectCreationDate_or_ShelfLife.get()
         prDevAmount = Var_Edit_ProjectDevsAmount_or_GoodQuantityInOneContainer.get()
         goodShelfLengthInSM = Var_Edit_ProjectInvests_or_GoodCost.get()
         shelfDescription = Text_Enter_Project_or_Dev_Description.get(1.0, tk.END)
         if CheckProjectName(shelfName):
             if CheckLeaderFIOName(prLeaderFIO):
-                if CheckProjectCrDate(prCrDate):
-                    if CheckDevsAmount(prDevAmount):
-                        if CheckInvests(goodShelfLengthInSM):
-                            try:
-                                cur.execute("SELECT goodID FROM goods WHERE goodNAME = %s", prLeaderFIO)
-                                goodID = cur.fetchall()[0][0]
-                                prCrDateList = prCrDate.split('.')
-                                day = prCrDateList[0]
-                                month = prCrDateList[1]
-                                year = prCrDateList[2]
-                                prCrDate = year + '-' + month + '-' + day
-                                if shelfDescription == "\n":
-                                    shelfDescription = "No additional information"
-                                cur.execute(
-                                    'INSERT INTO shelfs (shelfName, goodHereID, goodLastChangedDate, goodContainersAmount, goodShelfLengthInSM, shelfDescript, goodOldHereName)'
-                                    'VALUES (%s, %s, %s, %s, %s, %s, %s)',
-                                    (shelfName, goodID, prCrDate, prDevAmount, goodShelfLengthInSM, shelfDescription,
-                                     prLeaderFIO))
-                                messagebox.showinfo("Успешное добавление записи в базу данных",
-                                                    "Добавление записи о Полке в базу данных проведено успешно!")
-                                DB.commit()
-                                Finish_Any_Operation()
-                            except:
-                                DB.rollback()
-                                messagebox.showerror("Ошибка при добавлении данных в базу",
-                                                     "По неизвестной причине не удалось добавить данные в БД!")
+                if CheckGoodQuantity(prGoodQuantity):
+                    if CheckProjectCrDate(prCrDate):
+                        if CheckDevsAmount(prDevAmount):
+                            if CheckInvests(goodShelfLengthInSM):
+                                try:
+                                    cur.execute("SELECT goodID FROM goods WHERE goodNAME = %s", prLeaderFIO)
+                                    goodID = cur.fetchall()[0][0]
+                                    prCrDateList = prCrDate.split('.')
+                                    day = prCrDateList[0]
+                                    month = prCrDateList[1]
+                                    year = prCrDateList[2]
+                                    prCrDate = year + '-' + month + '-' + day
+                                    if shelfDescription == "\n":
+                                        shelfDescription = "No additional information"
+                                    cur.execute(
+                                        'INSERT INTO shelfs (shelfName, goodHereID, goodLastChangedDate, goodContainersAmount, goodShelfLengthInSM, shelfDescript, goodOldHereName)'
+                                        'VALUES (%s, %s, %s, %s, %s, %s, %s)',
+                                        (shelfName, goodID, prCrDate, prDevAmount, goodShelfLengthInSM, shelfDescription,
+                                         prLeaderFIO))
+                                    messagebox.showinfo("Успешное добавление записи в базу данных",
+                                                        "Добавление записи о Полке в базу данных проведено успешно!")
+                                    DB.commit()
+                                    Finish_Any_Operation()
+                                except:
+                                    DB.rollback()
+                                    messagebox.showerror("Ошибка при добавлении данных в базу",
+                                                         "По неизвестной причине не удалось добавить данные в БД!")
     elif Var_OutputMenu.get() == "товар":
         devName = Var_Edit_ProjectName_or_DevName.get()
+        goodQuantity = Var_Edit_GoodQuantity.get()
         shelfLife = Var_Edit_ProjectCreationDate_or_ShelfLife.get()
         goodQuantityInOneContainer = Var_Edit_ProjectDevsAmount_or_GoodQuantityInOneContainer.get()
         goodCost = Var_Edit_ProjectInvests_or_GoodCost.get()
@@ -491,8 +507,8 @@ def Add_Data_Confirm():
                             if goodDescription == "\n":
                                 goodDescription = "No additional information"
                             cur.execute(
-                                'INSERT INTO goods (goodNAME, shelfLife, goodQuantityInOneContainer, goodCost, goodDescript)'
-                                'VALUES (%s, %s, %s, %s, %s)',
+                                'INSERT INTO goods (goodNAME, goodQuantity, shelfLife, goodQuantityInOneContainer, goodCost, goodDescript)'
+                                'VALUES (%s, %s, %s, %s, %s, %s)',
                                 (devName, shelfLife, goodQuantityInOneContainer, goodCost, goodDescription))
                             messagebox.showinfo("Успешное добавление записи в базу данных",
                                                 "Добавление записи о товаре в базу данных проведено успешно!")
@@ -519,13 +535,14 @@ def Edit_Data():
     elif Var_OutputMenu.get() == "товар":
         Var_OutputMenu_Shelfs_or_Devs.set("Выбрать товара для изменений")
         OutputMenu_Choose_Project_or_Dev.place(relx=0.47, rely=0.3, anchor="c")
-        Btn_Choose_Date.place(relx=0.525, rely=0.42, anchor="c")
+        Btn_Choose_Date.place(relx=0.525, rely=0.38, anchor="c")
 
 
 def Edit_Data_Confirm():
     if Var_OutputMenu.get() == "полки":
         shelfName = Var_OutputMenu_Shelfs_or_Devs.get()
         prLeaderFIO = Var_OutputMenu_Devs.get()
+        prGoodQuantity = Var_Edit_GoodQuantity.get()
         prCrDate = Var_Edit_ProjectCreationDate_or_ShelfLife.get()
         prDevAmount = Var_Edit_ProjectDevsAmount_or_GoodQuantityInOneContainer.get()
         goodShelfLengthInSM = Var_Edit_ProjectInvests_or_GoodCost.get()
@@ -562,6 +579,7 @@ def Edit_Data_Confirm():
                                                      "По неизвестной причине не удалось редактировать данные в БД!")
     elif Var_OutputMenu.get() == "товар":
         devName = Var_OutputMenu_Shelfs_or_Devs.get()
+        goodQuantity = Var_Edit_GoodQuantity.get()
         shelfLife = Var_Edit_ProjectCreationDate_or_ShelfLife.get()
         goodQuantityInOneContainer = Var_Edit_ProjectDevsAmount_or_GoodQuantityInOneContainer.get()
         goodCost = Var_Edit_ProjectInvests_or_GoodCost.get()
@@ -657,23 +675,25 @@ def Project_or_Dev_For_Delete_Chosen(*args):
                 leader_id = pr_info[0][2]
                 cur.execute("SELECT goodNAME FROM goods WHERE goodID = %s", leader_id)
                 Var_Edit_LeaderFIO.set(cur.fetchall()[0][0])
-                Var_Edit_ProjectCreationDate_or_ShelfLife.set(str(pr_info[0][3]))
-                Var_Edit_ProjectDevsAmount_or_GoodQuantityInOneContainer.set(str(pr_info[0][4]))
-                Var_Edit_ProjectInvests_or_GoodCost.set(pr_info[0][5])
+                Var_Edit_GoodQuantity.set(str(pr_info[0][3]))
+                Var_Edit_ProjectCreationDate_or_ShelfLife.set(str(pr_info[0][4]))
+                Var_Edit_ProjectDevsAmount_or_GoodQuantityInOneContainer.set(str(pr_info[0][5]))
+                Var_Edit_ProjectInvests_or_GoodCost.set(pr_info[0][6])
                 Text_Enter_Project_or_Dev_Description["state"] = "normal"
                 Text_Enter_Project_or_Dev_Description.delete(1.0, tk.END)
-                Text_Enter_Project_or_Dev_Description.insert(tk.END, pr_info[0][6])
+                Text_Enter_Project_or_Dev_Description.insert(tk.END, pr_info[0][7])
                 Text_Enter_Project_or_Dev_Description["state"] = "disable"
         elif Var_OutputMenu.get() == "товар":
             if "Выбрать товара для" not in pr_or_dev_Name:
                 cur.execute("SELECT * FROM goods WHERE goodNAME = %s", pr_or_dev_Name)
                 pr_or_dev_info = cur.fetchall()
-                Var_Edit_ProjectCreationDate_or_ShelfLife.set(str(pr_or_dev_info[0][2]))
-                Var_Edit_ProjectDevsAmount_or_GoodQuantityInOneContainer.set(str(pr_or_dev_info[0][3]))
-                Var_Edit_ProjectInvests_or_GoodCost.set(pr_or_dev_info[0][4])
+                Var_Edit_GoodQuantity.set(str(pr_or_dev_info[0][2]))
+                Var_Edit_ProjectCreationDate_or_ShelfLife.set(str(pr_or_dev_info[0][3]))
+                Var_Edit_ProjectDevsAmount_or_GoodQuantityInOneContainer.set(str(pr_or_dev_info[0][4]))
+                Var_Edit_ProjectInvests_or_GoodCost.set(pr_or_dev_info[0][5])
                 Text_Enter_Project_or_Dev_Description["state"] = "normal"
                 Text_Enter_Project_or_Dev_Description.delete(1.0, tk.END)
-                Text_Enter_Project_or_Dev_Description.insert(tk.END, pr_or_dev_info[0][5])
+                Text_Enter_Project_or_Dev_Description.insert(tk.END, pr_or_dev_info[0][6])
                 Text_Enter_Project_or_Dev_Description["state"] = "disable"
 
 
@@ -788,6 +808,12 @@ Btn_Choose_Date = tk.Button(MainWindow, text="Выбрать дату", font=("A
 Lbl_Enter_Project_DevsAmount = tk.Label(MainWindow, text='Количество контейнеров объёмом 100см^3:',
                                         font=("Arial Bold", 15), bg="#20B2AA")
 
+Lbl_Enter_PrCount = tk.Label(MainWindow, text='Количество товара:',
+                             font=("Arial Bold", 28), bg="#20B2AA")
+
+TxtEdit_Enter_Good_quantity = tk.Entry(MainWindow, width=34, bd=5, font=("Arial Bold", 20),
+                                       textvariable=Var_Edit_ProjectInvests_or_GoodCost)
+
 Lbl_Enter_Dev_SolvedPrCount = tk.Label(MainWindow, text='Количество товара в одном контейнере(100см^3):',
                                        font=("Arial Bold", 14), bg="#20B2AA")
 
@@ -871,20 +897,23 @@ Table_Goods_output = ttk.Treeview(MainWindow, height=34, show="headings", select
 Table_Goods_output["columns"] = goods_headings
 Table_Goods_output["displaycolumns"] = goods_headings
 Table_Goods_output.heading(goods_headings[0], text=goods_headings[0], anchor=tk.CENTER)
-Table_Goods_output.column(goods_headings[0], width=200, anchor=tk.CENTER)
+Table_Goods_output.column(goods_headings[0], width=100, anchor=tk.CENTER)
 Table_Goods_output.heading(goods_headings[1], text=goods_headings[1], anchor=tk.CENTER)
-Table_Goods_output.column(goods_headings[1], width=100, anchor=tk.CENTER)
+Table_Goods_output.column(goods_headings[1], width=120, anchor=tk.CENTER)
 Table_Goods_output.heading(goods_headings[2], text=goods_headings[2], anchor=tk.CENTER)
-Table_Goods_output.column(goods_headings[2], width=300, anchor=tk.CENTER)
+Table_Goods_output.column(goods_headings[2], width=100, anchor=tk.CENTER)
 Table_Goods_output.heading(goods_headings[3], text=goods_headings[3], anchor=tk.CENTER)
-Table_Goods_output.column(goods_headings[3], width=130, anchor=tk.CENTER)
+Table_Goods_output.column(goods_headings[3], width=300, anchor=tk.CENTER)
 Table_Goods_output.heading(goods_headings[4], text=goods_headings[4], anchor=tk.CENTER)
-Table_Goods_output.column(goods_headings[4], width=260, anchor=tk.CENTER)
-Table_Goods_output.column('#' + str(1), minwidth=300, stretch=False)
-Table_Goods_output.column('#' + str(2), minwidth=100, stretch=False)
-Table_Goods_output.column('#' + str(3), minwidth=160, stretch=False)
-Table_Goods_output.column('#' + str(4), minwidth=100, stretch=False)
-Table_Goods_output.column('#' + str(5), minwidth=330, stretch=False)
+Table_Goods_output.column(goods_headings[4], width=120, anchor=tk.CENTER)
+Table_Goods_output.heading(goods_headings[5], text=goods_headings[5], anchor=tk.CENTER)
+Table_Goods_output.column(goods_headings[5], width=250, anchor=tk.CENTER)
+Table_Goods_output.column('#' + str(1), minwidth=100, stretch=False)
+Table_Goods_output.column('#' + str(2), minwidth=120, stretch=False)
+Table_Goods_output.column('#' + str(3), minwidth=100, stretch=False)
+Table_Goods_output.column('#' + str(4), minwidth=300, stretch=False)
+Table_Goods_output.column('#' + str(5), minwidth=120, stretch=False)
+Table_Goods_output.column('#' + str(6), minwidth=250, stretch=False)
 
 Table_Shelfs_output_scroll_vertical = tk.Scrollbar(MainWindow, command=Table_Shelfs_output.yview)
 Table_Shelfs_output.configure(yscrollcommand=Table_Shelfs_output_scroll_vertical.set)
