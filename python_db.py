@@ -232,25 +232,42 @@ def CheckGoodCost(str):
         return False
 
 
-def Select_Data():
-    # sensor_data = get_sensor_data()
-    # if sensor_data < 20.2:
-    #     cur.execute(
-    #         "UPDATE shelfs SET goodLastChangedDate = %s, goodContainersAmount = %s WHERE shelfID = %s",
-    #         (date.today(), 3, 1))
-    # elif (sensor_data > 20.2) and (sensor_data < 120.2):
-    #     cur.execute(
-    #         "UPDATE shelfs SET goodLastChangedDate = %s, goodContainersAmount = %s WHERE shelfID = %s",
-    #         (date.today(), 2, 1))
-    # elif (sensor_data > 120.2) and (sensor_data < 220.2):
-    #     cur.execute(
-    #         "UPDATE shelfs SET goodLastChangedDate = %s, goodContainersAmount = %s WHERE shelfID = %s",
-    #         (date.today(), 1, 1))
-    # elif sensor_data > 220.2:
-    #     cur.execute(
-    #         "UPDATE shelfs SET goodLastChangedDate = %s, goodContainersAmount = %s WHERE shelfID = %s",
-    #         (date.today(), 0, 1))
+def Update_Data_By_Sensor():
+    sensor_data = get_sensor_data()
 
+    if sensor_data < 20.2:
+        cur.execute(
+            "UPDATE shelfs SET goodLastChangedDate = %s, goodContainersAmount = %s WHERE shelfID = %s",
+            (date.today(), 3, 1))
+        cur.execute(
+            "UPDATE goods SET goodQuantity = %s WHERE goodID = %s",
+            (36, 1))
+    elif (sensor_data > 20.2) and (sensor_data < 120.2):
+        cur.execute(
+            "UPDATE shelfs SET goodLastChangedDate = %s, goodContainersAmount = %s WHERE shelfID = %s",
+            (date.today(), 2, 1))
+        cur.execute(
+            "UPDATE goods SET goodQuantity = %s WHERE goodID = %s",
+            (24, 1))
+    elif (sensor_data > 120.2) and (sensor_data < 220.2):
+        cur.execute(
+            "UPDATE shelfs SET goodLastChangedDate = %s, goodContainersAmount = %s WHERE shelfID = %s",
+            (date.today(), 1, 1))
+        cur.execute(
+            "UPDATE goods SET goodQuantity = %s WHERE goodID = %s",
+            (12, 1))
+    elif sensor_data > 220.2:
+        cur.execute(
+            "UPDATE shelfs SET goodLastChangedDate = %s, goodContainersAmount = %s WHERE shelfID = %s",
+            (date.today(), 0, 1))
+        cur.execute(
+            "UPDATE goods SET goodQuantity = %s WHERE goodID = %s",
+            (0, 1))
+
+    Select_Data()
+
+
+def Select_Data():
     if Var_OutputMenu.get() == "полки":
         for row in Table_Shelfs_output.get_children():
             Table_Shelfs_output.delete(row)
@@ -622,7 +639,8 @@ def Edit_Data_Confirm():
                                 cur.execute(
                                     'UPDATE goods SET goodNAME = %s, lifeCycle = %s, goodQuantity = %s, goodQuantityInOneContainer = %s,'
                                     'goodCost = %s, goodDescript = %s WHERE goodID = %s',
-                                    (goodName, lifeCycle, int(goodQuantity), int(goodQuantityInOneContainer), float(goodCost), goodDescription,
+                                    (goodName, lifeCycle, int(goodQuantity), int(goodQuantityInOneContainer),
+                                     float(goodCost), goodDescription,
                                      goodID))
                                 messagebox.showinfo("Успешное редактирование записи в базе данных",
                                                     "Редактирование записи о товаре в базе данных проведено успешно!")
@@ -782,6 +800,10 @@ OutputMenu_ChooseDir.place(relx=0.83, rely=0.14, anchor="c")
 
 Var_OutputMenu.trace("w", Dir_Chosen)
 
+Btn_Update_Data_By_Sensor = tk.Button(MainWindow, text="Обновить данные полок (Shelf 1-1-1)", font=("Arial Bold", 14),
+                                      bd=10, background="#008B8B", command=Update_Data_By_Sensor, width=40)
+Btn_Update_Data_By_Sensor.place(relx=0.83, rely=0.22, anchor="c")
+
 Btn_Select_Data = tk.Button(MainWindow, text="Вывести все записи", font=("Arial Bold", 28), bd=10,
                             background="#008B8B", command=Select_Data, width=20, state="disabled")
 Btn_Select_Data.place(relx=0.83, rely=0.34, anchor="c")
@@ -833,26 +855,26 @@ Lbl_Enter_Shelf_ContainersQuantity = tk.Label(MainWindow, text='Количест
                                               font=("Arial Bold", 15), bg="#20B2AA")
 
 Lbl_Enter_Shelf_GoodQuantity = tk.Label(MainWindow, text='Количество товара:',
-                                font=("Arial Bold", 28), bg="#20B2AA")
+                                        font=("Arial Bold", 28), bg="#20B2AA")
 
 TxtEdit_Enter_Good_quantity = tk.Entry(MainWindow, width=34, bd=5, font=("Arial Bold", 20),
                                        textvariable=Var_Edit_GoodQuantity)
 
 Lbl_Enter_Good_Quantity_in_one_container = tk.Label(MainWindow, text='Количество товара в одном контейнере(100см^3):',
-                                           font=("Arial Bold", 14), bg="#20B2AA")
+                                                    font=("Arial Bold", 14), bg="#20B2AA")
 
 TxtEdit_Enter_ShelfGoodsAmount_or_GoodQuantityInOneContainer = tk.Entry(MainWindow, width=34, bd=5,
                                                                         font=("Arial Bold", 20),
                                                                         textvariable=Var_Edit_GoodContainersAmount_or_GoodQuantityInOneContainer)
 
 Lbl_Enter_Shelf_LengthInSM = tk.Label(MainWindow, text='Длина полки в см:',
-                                       font=("Arial Bold", 24), bg="#20B2AA")
+                                      font=("Arial Bold", 24), bg="#20B2AA")
 
 Lbl_Enter_Good_Cost = tk.Label(MainWindow, text='Стоимость товара:',
-                                 font=("Arial Bold", 28), bg="#20B2AA")
+                               font=("Arial Bold", 28), bg="#20B2AA")
 
 TxtEdit_Enter_ShelfLengthInSM_or_GoodCost = tk.Entry(MainWindow, width=34, bd=5, font=("Arial Bold", 20),
-                                                      textvariable=Var_Edit_GoodShelfLengthInSM_or_GoodCost)
+                                                     textvariable=Var_Edit_GoodShelfLengthInSM_or_GoodCost)
 
 Lbl_Enter_Shelf_Description = tk.Label(MainWindow, text='Описание устройства отслеживания полки:',
                                        font=("Arial Bold", 13), bg="#20B2AA")
