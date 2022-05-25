@@ -746,7 +746,7 @@ Lbl_FIO = tk.Label(MainWindow, text="Система учёта товаров н
 Lbl_FIO.place(relx=0.215, rely=0.025, anchor="c")
 
 Lbl_Start = tk.Label(MainWindow, text='Программа для ручного учёта товаров на складе\n\n'
-                                      'База данных автоматически изменяется со временем\n\n'
+                                      'База данных автоматически обновляется по кнопке\n\n'
                                       'Язык программирования: Python\n\n'
                                       'Технологии: Tkinter, pymysql\n\n'
                                       'Среда разработки: PyCharm\n\n',
