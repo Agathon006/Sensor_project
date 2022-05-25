@@ -164,29 +164,7 @@ def CheckGoodName(str):
     if str == "":
         messagebox.showerror("Ошибка ввода названия товара", "Название товара не может быть пустым!")
     else:
-        if str.count(' ') != 1 and str.count(' ') != 2:
-            messagebox.showerror("Ошибка ввода названия товара",
-                                 "Название товара должно состоять из двух или трёх слов!")
-        else:
-            str_without_spaces = str.replace(' ', '')
-            if str_without_spaces.isalpha():
-                words = str.split(' ')
-                for word in words:
-                    if not word[0].isupper():
-                        messagebox.showerror("Ошибка ввода названия товара",
-                                             "Каждое из двух или трёх слов название товара должно начинаться с "
-                                             "большой буквы!")
-                        return False
-                cur.execute('SELECT EXISTS(SELECT * FROM goods WHERE goodNAME = %s)', str)
-                exist_or_not = cur.fetchall()[0][0]
-                if exist_or_not == 1:
-                    messagebox.showerror("Ошибка ввода названия товара",
-                                         "товар с таким названием уже есть в базе данных!")
-                    return False
-                return True
-            else:
-                messagebox.showerror("Ошибка ввода названия товара",
-                                     "В названии товара могут быть использованы только буквы!")
+        return True
     return False
 
 
@@ -521,7 +499,8 @@ def Add_Data_Confirm():
                                     if shelfDescription == "\n":
                                         shelfDescription = "No additional information"
                                     cur.execute(
-                                        'INSERT INTO shelfs (shelfName, goodHereID, goodLastChangedDate, goodContainersAmount, goodShelfLengthInSM, shelfDescript, goodOldHereName)'
+                                        'INSERT INTO shelfs (shelfName, goodHereID, goodLastChangedDate,'
+                                        ' goodContainersAmount, goodShelfLengthInSM, shelfDescript, goodOldHereName)'
                                         'VALUES (%s, %s, %s, %s, %s, %s, %s)',
                                         (
                                             shelfName, goodID, shelfCrDate, shelfContainersQuantity,
@@ -538,18 +517,18 @@ def Add_Data_Confirm():
                                                          "По неизвестной причине не удалось добавить данные в БД!")
     elif Var_OutputMenu.get() == "товар":
         goodName = Var_Edit_ShelfName_or_GoodName.get()
-        goodlifeCycle = Var_Edit_GoodLastChangedDate_or_LifeCycle.get()
+        lifeCycle = Var_Edit_GoodLastChangedDate_or_LifeCycle.get()
         goodQuantity = Var_Edit_GoodQuantity.get()
         goodQuantityInOneContainer = Var_Edit_GoodContainersAmount_or_GoodQuantityInOneContainer.get()
         goodCost = Var_Edit_GoodShelfLengthInSM_or_GoodCost.get()
         goodDescription = Text_Enter_Shelf_or_Good_Description.get(1.0, tk.END)
         if CheckGoodName(goodName):
-            if CheckLifeCycle(goodlifeCycle):
+            if CheckLifeCycle(lifeCycle):
                 if CheckGoodQuantity(goodQuantity):
                     if CheckGoodQuantityInOneContainer(goodQuantityInOneContainer):
                         if CheckGoodCost(goodCost):
                             try:
-                                lifeCycleList = goodlifeCycle.split('.')
+                                lifeCycleList = lifeCycle.split('.')
                                 day = lifeCycleList[0]
                                 month = lifeCycleList[1]
                                 year = lifeCycleList[2]
@@ -557,9 +536,11 @@ def Add_Data_Confirm():
                                 if goodDescription == "\n":
                                     goodDescription = "No additional information"
                                 cur.execute(
-                                    'INSERT INTO goods (goodNAME, goodQuantity, lifeCycle, goodQuantityInOneContainer, goodCost, goodDescript)'
+                                    'INSERT INTO goods (goodNAME, goodQuantity, shelfLife, goodQuantityInOneContainer,'
+                                    ' goodCost, goodDescript)'
                                     'VALUES (%s, %s, %s, %s, %s, %s)',
-                                    (goodName, lifeCycle, goodQuantityInOneContainer, goodCost, goodDescription))
+                                    (goodName, goodQuantity, lifeCycle, goodQuantityInOneContainer,
+                                     goodCost, goodDescription))
                                 messagebox.showinfo("Успешное добавление записи в базу данных",
                                                     "Добавление записи о товаре в базу данных проведено успешно!")
                                 DB.commit()
@@ -651,11 +632,10 @@ def Edit_Data_Confirm():
                                 if goodDescription == "\n":
                                     goodDescription = "No additional information"
                                 cur.execute(
-                                    'UPDATE goods SET goodNAME = %s, lifeCycle = %s, goodQuantity = %s, goodQuantityInOneContainer = %s,'
+                                    'UPDATE goods SET goodNAME = %s, goodQuantity = %s, shelfLife = %s, goodQuantityInOneContainer = %s,'
                                     'goodCost = %s, goodDescript = %s WHERE goodID = %s',
-                                    (goodName, lifeCycle, int(goodQuantity), int(goodQuantityInOneContainer),
-                                     float(goodCost), goodDescription,
-                                     goodID))
+                                    (goodName, goodQuantity, lifeCycle, goodQuantityInOneContainer,
+                                     goodCost, goodDescription, goodID))
                                 messagebox.showinfo("Успешное редактирование записи в базе данных",
                                                     "Редактирование записи о товаре в базе данных проведено успешно!")
                                 DB.commit()
