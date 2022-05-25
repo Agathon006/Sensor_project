@@ -247,16 +247,21 @@ def Update_Data_By_Sensor():
 
     Select_Data()
 
-    cur.execute("SELECT * FROM goods WHERE goodID = 1")
+    cur.execute("SELECT * FROM goods")
     query_result = cur.fetchall()
+    message = ""
     for str_i in query_result:
 
         difference = abs((str_i[3] - date.today()).days)
 
         if difference <= 7:
-            message = "Product Milk will expire in " + str(difference) + " days"
-            print(message)
-            send_notification(message)
+            if message != "":
+                message += "\n"
+            message += "Product " + str_i[1] + " will expire in " + str(difference) + " days"
+
+    if message != "":
+        print(message)
+        send_notification(message)
 
 
 def Select_Data():
