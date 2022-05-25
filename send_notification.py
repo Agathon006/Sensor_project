@@ -1,13 +1,15 @@
 import smtplib
 
-# help(smtplib)
 
-smtpObj = smtplib.SMTP('smtp.gmail.com', 587)
+def send_notification(message):
+    # help(smtplib)
 
-smtpObj.starttls()
+    smtpObj = smtplib.SMTP('smtp.gmail.com', 587)
 
-smtpObj.login('sensor.project.aga@gmail.com','2051868Dd')
+    smtpObj.starttls()
 
-smtpObj.sendmail("sensor.project.aga@gmail.com","agaton615@gmail.com","first check test")
+    smtpObj.login('sensor.project.aga@gmail.com', '2051868Dd')
 
-smtpObj.quit()
+    smtpObj.sendmail("sensor.project.aga@gmail.com", "agaton615@gmail.com", message)
+
+    smtpObj.quit()

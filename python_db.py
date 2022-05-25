@@ -6,6 +6,7 @@ import pymysql
 from tkcalendar import DateEntry
 
 from main import get_sensor_data
+from send_notification import send_notification
 
 DB = pymysql.connect(host='localhost',
                      user='root',
@@ -256,6 +257,7 @@ def Update_Data_By_Sensor():
         cur.execute(
             "UPDATE goods SET goodQuantity = %s WHERE goodID = %s",
             (12, 1))
+        send_notification("There only 12 packs of milk left in your warehouse")
     elif sensor_data > 220.2:
         cur.execute(
             "UPDATE shelfs SET goodLastChangedDate = %s, goodContainersAmount = %s WHERE shelfID = %s",
@@ -263,6 +265,7 @@ def Update_Data_By_Sensor():
         cur.execute(
             "UPDATE goods SET goodQuantity = %s WHERE goodID = %s",
             (0, 1))
+        send_notification("There no packs of milk left in your warehouse")
 
     Select_Data()
 
