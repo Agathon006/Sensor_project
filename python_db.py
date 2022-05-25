@@ -1,6 +1,6 @@
 import tkinter as tk
 import tkinter.ttk as ttk
-from datetime import date
+from datetime import date, datetime
 from tkinter import messagebox
 import pymysql
 from tkcalendar import DateEntry
@@ -257,7 +257,7 @@ def Update_Data_By_Sensor():
         cur.execute(
             "UPDATE goods SET goodQuantity = %s WHERE goodID = %s",
             (12, 1))
-        send_notification("There only 12 packs of milk left in your warehouse")
+        # send_notification("There only 12 packs of milk left in your warehouse")
     elif sensor_data > 220.2:
         cur.execute(
             "UPDATE shelfs SET goodLastChangedDate = %s, goodContainersAmount = %s WHERE shelfID = %s",
@@ -265,9 +265,20 @@ def Update_Data_By_Sensor():
         cur.execute(
             "UPDATE goods SET goodQuantity = %s WHERE goodID = %s",
             (0, 1))
-        send_notification("There no packs of milk left in your warehouse")
+        # send_notification("There no packs of milk left in your warehouse")
 
     Select_Data()
+
+    cur.execute("SELECT * FROM goods WHERE goodID = 1")
+    query_result = cur.fetchall()
+    for str_i in query_result:
+
+        difference = abs((str_i[3] - date.today()).days)
+
+        if difference <= 7:
+            message = "Product Milk will expire in " + str(difference) + " days"
+            print(message)
+            send_notification(message)
 
 
 def Select_Data():
