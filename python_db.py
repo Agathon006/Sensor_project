@@ -116,7 +116,8 @@ def CheckGoodQuantity(str, str_in_one_cont):
 
 def CheckShelfLastDateChange(str):
     if str == "":
-        messagebox.showerror("Ошибка выбора даты создания полки", "Вы не выбрали дату создания полки!")
+        messagebox.showerror("Ошибка выбора даты последнего изменения на полке", "Вы не выбрали дату последнего "
+                                                                                 "изменения на полке!")
     else:
         return True
     return False
@@ -238,7 +239,7 @@ def Update_Data_By_Sensor():
         cur.execute(
             "UPDATE goods SET goodQuantity = %s WHERE goodID = %s",
             (12, 1))
-        # send_notification("There only 12 packs of milk left in your warehouse")
+        send_notification("There only 12 packs of milk left in your warehouse")
     elif sensor_data > 220.2:
         cur.execute(
             "UPDATE shelfs SET goodLastChangedDate = %s, goodContainersAmount = %s WHERE shelfID = %s",
