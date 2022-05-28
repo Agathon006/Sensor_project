@@ -103,9 +103,12 @@ def CheckShelfGoodName(str):
     return False
 
 
-def CheckGoodQuantity(str):
+def CheckGoodQuantity(str, str_in_one_cont):
     if str == "":
         messagebox.showerror("Ошибка ввода количества товара", "Вы не выбрали количество товара!")
+    elif int(str) % int(str_in_one_cont) != 0:
+        messagebox.showerror("Ошибка ввода количества товара", "Количество товара должно быть кратно количеству этого "
+                                                               "товара в одном контейнере")
     else:
         return True
     return False
@@ -243,7 +246,7 @@ def Update_Data_By_Sensor():
         cur.execute(
             "UPDATE goods SET goodQuantity = %s WHERE goodID = %s",
             (0, 1))
-        # send_notification("There no packs of milk left in your warehouse")
+        send_notification("There no packs of milk left in your warehouse")
 
     Select_Data()
 
@@ -529,7 +532,7 @@ def Add_Data_Confirm():
         goodDescription = Text_Enter_Shelf_or_Good_Description.get(1.0, tk.END)
         if CheckGoodName(goodName):
             if CheckLifeCycle(lifeCycle):
-                if CheckGoodQuantity(goodQuantity):
+                if CheckGoodQuantity(goodQuantity, goodQuantityInOneContainer):
                     if CheckGoodQuantityInOneContainer(goodQuantityInOneContainer):
                         if CheckGoodCost(goodCost):
                             try:
@@ -623,7 +626,7 @@ def Edit_Data_Confirm():
         goodDescription = Text_Enter_Shelf_or_Good_Description.get(1.0, tk.END)
         if CheckIfGoodChosen(goodName):
             if CheckLifeCycle(lifeCycle):
-                if CheckGoodQuantity(goodQuantity):
+                if CheckGoodQuantity(goodQuantity, goodQuantityInOneContainer):
                     if CheckGoodQuantityInOneContainer(goodQuantityInOneContainer):
                         if CheckGoodCost(goodCost):
                             try:
@@ -799,7 +802,7 @@ OutputMenu_ChooseDir.place(relx=0.83, rely=0.14, anchor="c")
 
 Var_OutputMenu.trace("w", Dir_Chosen)
 
-Btn_Update_Data_By_Sensor = tk.Button(MainWindow, text="Обновить данные полок (Shelf 1-1-1)", font=("Arial Bold", 14),
+Btn_Update_Data_By_Sensor = tk.Button(MainWindow, text="Обновить данные полок", font=("Arial Bold", 14),
                                       bd=10, background="#008B8B", command=Update_Data_By_Sensor, width=40)
 Btn_Update_Data_By_Sensor.place(relx=0.83, rely=0.22, anchor="c")
 
